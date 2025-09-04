@@ -74,3 +74,31 @@ exports.getJobsByEmployer = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+exports.getApplicationsByJobIds = async (req, res) => {
+  try {
+    let { jobIds } = req.query;
+
+    if (!jobIds) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide jobIds in query params",
+      });
+    }
+
+    // Convert comma-separated string → array
+    jobIds = jobIds.split(",").map((id) => id.trim());
+
+    const applications = await Application.find({
+      jobId: { $in: jobIds },
+    });
+
+    res.status(200).json({
+      success: true,
+      totalApplications: applications.length,
+      applications,
+    });
+  } catch (error) {
+    console.error("❌ Get Applications by JobIds Error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
