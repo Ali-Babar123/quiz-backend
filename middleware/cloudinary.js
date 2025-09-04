@@ -1,0 +1,23 @@
+const { v2: cloudinary } = require("cloudinary");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const multer = require("multer");
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_SECRET_KEY,
+});
+
+// ✅ Storage on Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "resumes", // Cloudinary folder name
+    resource_type: "raw", // for PDF, DOC, DOCX
+    public_id: (req, file) => file.fieldname + "-" + Date.now(),
+  },
+});
+
+const upload = multer({ storage });
+
+module.exports = { cloudinary, upload };
