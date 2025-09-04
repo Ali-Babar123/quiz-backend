@@ -1,5 +1,5 @@
 const Job = require("../models/Job");
-
+const Application = require('../models/Application')
 // ✅ Create Job
 exports.createJob = async (req, res) => {
   try {
