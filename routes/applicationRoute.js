@@ -6,6 +6,7 @@ const {
   updateApplication,
   deleteApplication,
   getApplicationsByJobId,
+  getApplicationsByUserId
 } = require("../controller/applicationController");
 const {verifyToken} = require('../middleware/authmiddleware')
 const {upload} = require('../middleware/cloudinary')
@@ -21,5 +22,5 @@ router.delete("/deleteApplication/:id", verifyToken, deleteApplication);     // 
 router.get('/getApplicationsByJob/:jobId', verifyToken, getApplicationsByJobId);
 
 
-
+router.get("/getApplicationsByUser/:userId", verifyToken, getApplicationsByUserId);
 module.exports = router;

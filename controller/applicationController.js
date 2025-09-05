@@ -121,3 +121,51 @@ exports.getApplicationsByJobId = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// ✅ Get Applications by User ID
+exports.getApplicationsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const applications = await Application.find({ userId });
+
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No applications found for this user",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: applications.length,
+      data: applications,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching applications by User ID:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+// ✅ Get Applications by User ID
+exports.getApplicationsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const applications = await Application.find({ userId });
+
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No applications found for this user",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      count: applications.length,
+      data: applications,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching applications by User ID:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
