@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const signupSchema = new mongoose.Schema({
   fullName: {type: String, required: true},
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, default: "" },
   userType: { type: String, enum: ["JobSeeker", "HiringManager"], default: "JobSeeker" },
   phoneNumber: {type: String},
   isOnboarding: { type: Boolean, default: false },

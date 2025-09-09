@@ -6,32 +6,54 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 exports.googleLogin = async (req, res) => {
   try {
-    const { token } = req.body; // frontend sends Google ID token
+    const { token: googleToken } = req.body; // frontend sends Google ID token
 
     // Verify token with Google
     const ticket = await client.verifyIdToken({
-      idToken: token,
+      idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
-    const { email } = payload;
+    const { email, name, picture } = payload;
 
     // Find or create user by email
     let user = await User.findOne({ email });
+
     if (!user) {
-      user = await User.create({ email });
+      user = await User.create({
+        fullName: name || "Google User",
+        email,
+        password: null,       // no password since it's Google login
+        userType: "user",     // or set default role
+        isVerified: true,     // Google already verified
+        profileImage: picture // if you want to store Google avatar
+      });
     }
 
-    // Generate JWT with NO expiration
+    // Generate your own JWT
     const appToken = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET
+      { id: user._id, email: user.email, userType: user.userType },
+      process.env.JWT_SECRET,
+      
     );
 
-    res.json({ token: appToken, email: user.email });
+    // Response in same format as login/signup
+    res.json({
+      success: true,
+      message: "Google login successful",
+      token: appToken,
+      googleToken, // optional: return Google ID token if you want
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        userType: user.userType,
+        profileImage: user.profileImage || picture,
+      },
+    });
   } catch (error) {
     console.error("Google login error:", error);
-    res.status(401).json({ message: "Invalid Google token" });
+    res.status(401).json({ success: false, message: "Invalid Google token" });
   }
 };

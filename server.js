@@ -186,6 +186,81 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
+
+
+// Simple Signup (no password, no OTP)
+app.post("/api/signupwithoutPassword", async (req, res) => {
+  try {
+    const { fullName, email, userType } = req.body;
+
+    if (!fullName || !email || !userType) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ success: false, message: "Email already registered" });
+    }
+
+    // Create new user without password
+    user = new User({
+      fullName,
+      email,
+      password: null,   // ❌ No password
+      userType,
+      isVerified: true, // ✅ Mark verified directly
+    });
+
+    await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email, userType: user.userType },
+      process.env.JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.json({
+      success: true,
+      message: "Signup successful!",
+      token,
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        userType: user.userType,
+      },
+    });
+
+  } catch (error) {
+    console.error("Signup error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+// ✅ Check if user exists by email
+app.post("/api/check-email", async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ success: false, message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (user) {
+      return res.json({ success: true, exists: true });
+    } else {
+      return res.json({ success: true, exists: false });
+    }
+
+  } catch (error) {
+    console.error("Check email error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 app.use('/api/users', UserRoute);
 app.use('/api/email', emailRoute)
 app.use('/api/auth', resetPasswordRoute);
