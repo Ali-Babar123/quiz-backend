@@ -64,3 +64,71 @@ exports.getAllMultipleImages = async (req, res) => {
     });
   }
 };
+// DELETE image by ID
+exports.deleteImage = async (req, res) => {
+  try {
+    const { id } = req.params; // MongoDB _id
+
+    if (!id) {
+      return res.status(400).json({ success: false, error: "Image ID is required" });
+    }
+
+    // Find image in DB
+    const image = await Image.findById(id);
+    if (!image) {
+      return res.status(404).json({ success: false, error: "Image not found" });
+    }
+
+    // Delete from Cloudinary
+    await cloudinary.uploader.destroy(image.public_id);
+
+    // Delete from MongoDB
+    await image.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Image deleted successfully",
+      id: id,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting image:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Server error",
+    });
+  }
+};
+// DELETE all images
+exports.deleteAllImages = async (req, res) => {
+  try {
+    const images = await Image.find();
+
+    if (!images || images.length === 0) {
+      return res.status(404).json({ success: false, message: "No images found" });
+    }
+
+    // Delete all images from Cloudinary
+    await Promise.all(
+      images.map(async (img) => {
+        if (img.public_id) {
+          await cloudinary.uploader.destroy(img.public_id);
+        }
+      })
+    );
+
+    // Delete all from MongoDB
+    await Image.deleteMany({});
+
+    res.status(200).json({
+      success: true,
+      message: "All images deleted successfully",
+      count: images.length
+    });
+  } catch (error) {
+    console.error("❌ Error deleting all images:", error);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Server error",
+    });
+  }
+};
