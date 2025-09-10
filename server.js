@@ -239,6 +239,7 @@ app.post("/api/signupwithoutPassword", async (req, res) => {
   }
 });
 // ✅ Check if user exists by email
+// ✅ Check if user exists by email
 app.post("/api/check-email", async (req, res) => {
   try {
     const { email } = req.body;
@@ -250,16 +251,39 @@ app.post("/api/check-email", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (user) {
-      return res.json({ success: true, exists: true });
-    } else {
-      return res.json({ success: true, exists: false });
-    }
+      // ✅ Generate JWT if user exists
+      const token = jwt.sign(
+        { id: user._id, email: user.email, userType: user.userType },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
 
+      return res.json({
+        success: true,
+        exists: true,
+        message: "Login successful",
+        token,
+        user: {
+          id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          userType: user.userType,
+        },
+      });
+    } else {
+      // ✅ User does not exist
+      return res.json({
+        success: true,
+        exists: false,
+        message: "User not found",
+      });
+    }
   } catch (error) {
     console.error("Check email error:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
 
 app.use('/api/users', UserRoute);
 app.use('/api/email', emailRoute)
