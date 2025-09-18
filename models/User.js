@@ -1,22 +1,22 @@
 const mongoose = require("mongoose");
 
 const signupSchema = new mongoose.Schema({
-  fullName: {type: String, required: true},
+  fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, default: "" },
   userType: { type: String, enum: ["JobSeeker", "HiringManager"], default: "JobSeeker" },
-  phoneNumber: {type: String},
+  phoneNumber: { type: String },
   isOnboarding: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
   otp: { type: String },
   otpExpires: { type: Date },
 
-  yearsOfExpirerence: {type: Number},
-  portfolio: {type: String},
+  yearsOfExpirerence: { type: Number },
+  portfolio: { type: String },
 
-  websiteUrl: {type: String},
-  industry: {type: String},
-  companySize: {type: String },
+  websiteUrl: { type: String },
+  industry: { type: String },
+  companySize: { type: String },
 
   dateOfBirth: { type: String, default: "" },
   gender: { type: String, default: "" },
@@ -40,29 +40,40 @@ const signupSchema = new mongoose.Schema({
 
   skills: { type: [String], default: [] },
 
+  // ✅ Updated Experience
   experience: [
     {
+      id: String,
+      title: String,
       company: String,
       role: String,
       description: String,
       startDate: String,
       endDate: String,
       isCurrent: Boolean,
+      location: String,
+      jobType: String,
     },
   ],
 
+  // ✅ Updated Education
   education: [
     {
+      id: String,
       school: String,
       degree: String,
       fieldOfStudy: String,
       startYear: Number,
       endYear: Number,
+      grade: Number,
+      description: String,
     },
   ],
 
+  // ✅ Updated Projects
   projects: [
     {
+      id: String,
       name: String,
       description: String,
       platform: String,
@@ -124,6 +135,5 @@ const signupSchema = new mongoose.Schema({
 
   activityLog: { type: [Object], default: [] },
 });
-
 
 module.exports = mongoose.model("User", signupSchema);

@@ -18,10 +18,14 @@ const ApplicationRoute = require('./routes/applicationRoute')
 const bookmarkRoute = require('./routes/bookmark');
 const companyRoute = require('./routes/company')
 const googleLoginRoute = require('./routes/googleLogin');
-const uploadMultipleImageRoute = require('./routes/uploadMultipleImages')
+const uploadMultipleImageRoute = require('./routes/uploadMultipleImages');
+const educationRoute = require('./routes/education')
+const projectRoute = require('./routes/project')
+const experienceRoute = require('./routes/experience')
 
 const app = express();
 const port = process.env.PORT || 5000;
+
 
 
 
@@ -298,7 +302,9 @@ app.use('/api', bookmarkRoute)
 app.use('/api', companyRoute);
 app.use('/api', googleLoginRoute);
 app.use('/api', uploadMultipleImageRoute);
-
+app.use('/api', educationRoute);
+app.use('/api', projectRoute);
+app.use('/api', experienceRoute);
 // Default route
 app.get("/", (req, res) => res.send("Running with OTP verification!"));
 
