@@ -5,18 +5,18 @@ const {verifyToken} = require('../middleware/authmiddleware')
 
 
 // Create
-router.post("/addEducation", verifyToken, educationController.addEducation);
+router.post("/addEducation/:userId", verifyToken, educationController.addEducation);
 
 // Read all
-router.get("/getEducation", verifyToken, educationController.getEducations);
+router.get("/getAllEducation/:userId", verifyToken, educationController.getEducations);
 
 // Read one by ID
-router.get("/getSingleEducation/:id", verifyToken, educationController.getEducationById);
+router.get("/getSingleEducation/:userId/:id", verifyToken, educationController.getEducationById);
 
 // Update
-router.put("/updateEducation/:id", verifyToken, educationController.updateEducation);
+router.put("/updateEducation/:userId/:id", verifyToken, educationController.updateEducation);
 
 // Delete
-router.delete("/deleteEducation/:id", verifyToken, educationController.deleteEducation);
+router.delete("/deleteEducation/:userId/:id", verifyToken, educationController.deleteEducation);
 
 module.exports = router;

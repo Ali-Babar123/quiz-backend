@@ -43,7 +43,6 @@ const signupSchema = new mongoose.Schema({
   // ✅ Updated Experience
   experience: [
     {
-      id: String,
       title: String,
       company: String,
       role: String,
@@ -59,7 +58,6 @@ const signupSchema = new mongoose.Schema({
   // ✅ Updated Education
   education: [
     {
-      id: String,
       school: String,
       degree: String,
       fieldOfStudy: String,
@@ -73,7 +71,6 @@ const signupSchema = new mongoose.Schema({
   // ✅ Updated Projects
   projects: [
     {
-      id: String,
       name: String,
       description: String,
       platform: String,
