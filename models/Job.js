@@ -7,6 +7,7 @@ const JobSchema = new mongoose.Schema(
     jobTitle: { type: String, required: true },
     jobDescription: { type: String, required: true },
     jobCategory: { type: String, default: "" },
+    appliedUsers: [{ type: String, default: [] }],
     jobSubCategory: { type: String, default: "" },
     employmentTypes: [{ type: String }],
     workplaceType: { type: String, default: "" },

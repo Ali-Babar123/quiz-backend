@@ -222,7 +222,7 @@ app.post("/api/signupwithoutPassword", async (req, res) => {
     const token = jwt.sign(
       { id: user._id, email: user.email, userType: user.userType },
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
+      
     );
 
     res.json({
@@ -259,7 +259,7 @@ app.post("/api/check-email", async (req, res) => {
       const token = jwt.sign(
         { id: user._id, email: user.email, userType: user.userType },
         process.env.JWT_SECRET,
-        { expiresIn: "1d" }
+      
       );
 
       return res.json({
