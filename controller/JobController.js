@@ -138,8 +138,10 @@ exports.filterJobs = async (req, res) => {
       languages,
       jobCategory,
       jobSubCategory,
-      page = 1,   // 👈 default page = 1
-      limit = 10, // 👈 default 10 jobs per request
+      jobTitle,
+      jobDescription,
+      page = 1,
+      limit = 10,
     } = req.body;
 
     let filter = {};
@@ -224,6 +226,30 @@ exports.filterJobs = async (req, res) => {
       filter.jobSubCategory = { $regex: new RegExp(`^${jobSubCategory}$`, "i") };
     }
 
+    // ✅ NEW: strict word-by-word matching for title
+   if (jobTitle) {
+  const words = jobTitle.trim().split(/\s+/);
+  filter.$or = [
+    ...(filter.$or || []),
+    ...words.map((word) => ({
+      jobTitle: { $regex: word, $options: "i" },
+    })),
+  ];
+}
+
+
+    // ✅ NEW: strict word-by-word matching for description
+   if (jobDescription) {
+  const words = jobDescription.trim().split(/\s+/);
+  filter.$or = [
+    ...(filter.$or || []),
+    ...words.map((word) => ({
+      jobDescription: { $regex: word, $options: "i" },
+    })),
+  ];
+}
+
+
     // ✅ Pagination
     const skip = (page - 1) * limit;
 
@@ -246,6 +272,7 @@ exports.filterJobs = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 
 
