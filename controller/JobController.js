@@ -249,3 +249,47 @@ exports.filterJobs = async (req, res) => {
 
 
 
+
+// controller function
+exports.getJobsCountByCategory = async (req, res) => {
+  try {
+    const { categories = [], subCategories = [] } = req.body; // list from frontend
+
+    // match jobs based on category or subcategory
+    const matchQuery = {
+      $or: [
+        { jobCategory: { $in: categories } },
+        { jobSubCategory: { $in: subCategories } }
+      ]
+    };
+
+    const jobs = await Job.aggregate([
+      { $match: matchQuery },
+      {
+        $facet: {
+          overallCount: [{ $count: "total" }],
+
+          categoryCounts: [
+            { $match: { jobCategory: { $in: categories } } },
+            { $group: { _id: "$jobCategory", count: { $sum: 1 } } }
+          ],
+
+          subCategoryCounts: [
+            { $match: { jobSubCategory: { $in: subCategories } } },
+            { $group: { _id: "$jobSubCategory", count: { $sum: 1 } } }
+          ]
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      overallCount: jobs[0].overallCount[0]?.total || 0,
+      categoryCounts: jobs[0].categoryCounts,
+      subCategoryCounts: jobs[0].subCategoryCounts
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
