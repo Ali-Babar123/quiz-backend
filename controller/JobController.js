@@ -138,6 +138,8 @@ exports.filterJobs = async (req, res) => {
       languages,
       jobCategory,
       jobSubCategory,
+      page = 1,   // 👈 default page = 1
+      limit = 10, // 👈 default 10 jobs per request
     } = req.body;
 
     let filter = {};
@@ -214,7 +216,6 @@ exports.filterJobs = async (req, res) => {
       };
     }
 
-    // ✅ New Fields (string-based)
     if (jobCategory) {
       filter.jobCategory = { $regex: new RegExp(`^${jobCategory}$`, "i") };
     }
@@ -223,11 +224,21 @@ exports.filterJobs = async (req, res) => {
       filter.jobSubCategory = { $regex: new RegExp(`^${jobSubCategory}$`, "i") };
     }
 
-    // Fetch jobs with filter
-    const jobs = await Job.find(filter).sort({ createdAt: -1 });
+    // ✅ Pagination
+    const skip = (page - 1) * limit;
+
+    const jobs = await Job.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalJobs = await Job.countDocuments(filter);
 
     res.status(200).json({
       success: true,
+      page: Number(page),
+      totalPages: Math.ceil(totalJobs / limit),
+      totalJobs,
       count: jobs.length,
       jobs,
     });
@@ -235,5 +246,6 @@ exports.filterJobs = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 
