@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { createJob, getJobs, getJobById, filterJobs, getAppliedJobs, getLimitedJobs, getJobsCountByCategory, updateJob, deleteJob, getJobsByEmployer, getApplicationsByJobIds } = require("../controller/JobController");
+const { createJob, getJobs, getJobById, filterJobs, getJobsByIds, getAppliedJobs, getLimitedJobs, getJobsCountByCategory, updateJob, deleteJob, getJobsByEmployer, getApplicationsByJobIds } = require("../controller/JobController");
 const {verifyToken} = require('../middleware/authmiddleware');
 
 
@@ -10,6 +10,7 @@ router.get("/getAllJobs", verifyToken, getJobs);
 router.get('/getAppliedJobs', verifyToken, getAppliedJobs);        // Get All Jobs
 router.get("/getLimitedJobs", verifyToken, getLimitedJobs);          // Get All Jobs
 
+router.post("/getJobsByIds", verifyToken, getJobsByIds);
 router.post('/filterJobs', verifyToken, filterJobs);
 router.post('/getJobsCountByCategory', verifyToken, getJobsCountByCategory);
 
