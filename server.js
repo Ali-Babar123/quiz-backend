@@ -35,7 +35,9 @@ connectDB();
 // Middlewares
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://nasir.temp2026.com'
+  'https://nasir.temp2026.com',
+  'https://nasir.temp2026.com/dashboard'
+
 ];
 
 app.use(cors({
