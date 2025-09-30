@@ -146,11 +146,29 @@ exports.getApplicationsByUserId = async (req, res) => {
   }
 };
 // ✅ Get Applications by User ID
+// ✅ Get Applications by User ID with Pagination
 exports.getApplicationsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
+    const page = parseInt(req.query.page) || 1;   // default page = 1
+    const limit = parseInt(req.query.limit) || 10; // default limit = 10
+    const skip = (page - 1) * limit;
 
-    const applications = await Application.find({ userId });
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required",
+      });
+    }
+
+    // Total count first
+    const totalApplications = await Application.countDocuments({ userId });
+
+    // Paginated results
+    const applications = await Application.find({ userId })
+      .sort({ createdAt: -1 }) // newest first
+      .skip(skip)
+      .limit(limit);
 
     if (!applications || applications.length === 0) {
       return res.status(404).json({
@@ -161,6 +179,9 @@ exports.getApplicationsByUserId = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      page,
+      totalPages: Math.ceil(totalApplications / limit),
+      totalApplications,
       count: applications.length,
       data: applications,
     });
@@ -169,3 +190,4 @@ exports.getApplicationsByUserId = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+

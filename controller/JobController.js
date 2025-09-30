@@ -13,6 +13,41 @@ exports.createJob = async (req, res) => {
 };
 exports.getJobs = async (req, res) => { try { const jobs = await Job.find(); res.status(200).json({ success: true, jobs }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } };
 
+
+// ✅ Get Applied Jobs by User
+exports.getAppliedJobs = async (req, res) => {
+  try {
+    const userId = req.query.userId; // frontend se ?userId= pass karna hoga
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    if (!userId) {
+      return res.status(400).json({ success: false, message: "User ID is required" });
+    }
+
+    // Jobs jisme appliedUsers array me userId exist karta ho
+    const jobs = await Job.find({ appliedUsers: userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const totalJobs = await Job.countDocuments({ appliedUsers: userId });
+
+    res.status(200).json({
+      success: true,
+      page,
+      totalPages: Math.ceil(totalJobs / limit),
+      totalJobs,
+      count: jobs.length,
+      jobs
+    });
+  } catch (error) {
+    console.error("❌ Get Applied Jobs Error:", error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
 // ✅ Get All Jobs
 exports.getLimitedJobs = async (req, res) => {
   try {
@@ -98,26 +133,43 @@ exports.getJobsByEmployer = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+// ✅ Get Applications by Multiple Job IDs with Pagination
 exports.getApplicationsByJobIds = async (req, res) => {
   try {
     const jobIds = req.query.jobIds?.split(",");
+    const page = parseInt(req.query.page) || 1;   // default page = 1
+    const limit = parseInt(req.query.limit) || 10; // default limit = 10
+    const skip = (page - 1) * limit;
 
     if (!jobIds || jobIds.length === 0) {
       return res.status(400).json({ success: false, message: "No job IDs provided" });
     }
 
-    const applications = await Application.find({ jobId: { $in: jobIds } });
+    // Total count
+    const totalApplications = await Application.countDocuments({
+      jobId: { $in: jobIds },
+    });
+
+    // Paginated results
+    const applications = await Application.find({ jobId: { $in: jobIds } })
+      .sort({ createdAt: -1 }) // newest first
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
+      page,
+      totalPages: Math.ceil(totalApplications / limit),
+      totalApplications,
       count: applications.length,
-      applications
+      applications,
     });
   } catch (error) {
     console.error("❌ Get Applications By JobIds Error:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
 
 
 
