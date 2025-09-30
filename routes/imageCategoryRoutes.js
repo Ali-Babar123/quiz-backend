@@ -8,7 +8,8 @@ const {
   deleteImageCategory,
   getImagesByCategoryId,
   editImageCategory,
-  editImageInCategory
+  editImageInCategory,
+  deleteImageInCategory
 } = require('../controller/imageCategoryContoller');
 
 router.post('/createCategory', createCategory);
@@ -20,4 +21,5 @@ router.get('/getImagesByCategory/:id', getImagesByCategoryId);
 router.put('/editImageCategory/:id', editImageCategory);
 
 router.put('/editImageInCategory/:categoryId/:imageId', editImageInCategory);
+router.delete('/deleteImageInCategory/:categoryId/:imageId', deleteImageInCategory);
 module.exports = router;

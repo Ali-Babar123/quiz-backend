@@ -229,3 +229,47 @@ exports.editImageInCategory = async (req, res) => {
     res.status(500).json({ error: error.message || "Server Error" });
   }
 };
+
+
+
+exports.deleteImageInCategory = async (req, res) => {
+  try {
+    const { categoryId, imageId } = req.params;
+
+    // Validate category ID
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res.status(400).json({ error: "Invalid category ID format" });
+    }
+
+    const category = await ImageCategory.findById(categoryId);
+    if (!category) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    // Find the image inside category
+    const image = category.images.id(imageId);
+    if (!image) {
+      return res.status(404).json({ error: "Image not found in category" });
+    }
+
+    // Delete from Cloudinary if it has public_id
+    if (image.public_id) {
+      await cloudinary.uploader.destroy(image.public_id);
+    }
+
+    // ✅ Correct way to remove subdocument
+    category.images.pull({ _id: imageId });
+
+    await category.save();
+
+    res.json({
+      message: "Image deleted successfully!",
+      deletedImageId: imageId
+    });
+
+  } catch (error) {
+    console.error("Error deleting image in category:", error);
+    res.status(500).json({ error: error.message || "Server Error" });
+  }
+};
+
