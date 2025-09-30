@@ -33,29 +33,11 @@ const port = process.env.PORT || 5000;
 connectDB();
 
 // Middlewares
-const allowedOrigins = [
-  'http://localhost:5173',
-  'https://nasir.temp2026.com',
-  'https://nasir.temp2026.com/dashboard'
-
-];
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: ['http://localhost:5173', 'https://nasir.temp2026.com', 'https://api.earnwithzippy.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
-
-// Preflight requests ko handle karein
-app.options('*', cors());
-
-
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 app.use("/uploads", express.static("uploads"));
