@@ -34,7 +34,7 @@ connectDB();
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://nasir.temp2026.com'],
+  origin: ['http://localhost:5173', 'https://nasir.temp2026.com', 'https://api.earnwithzippy.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
@@ -310,8 +310,4 @@ app.get("/", (req, res) => res.send("Running with OTP verification!"));
 
 
 // Start server
-if (process.env.NODE_ENV !== "production") {
-  app.listen(port, () => console.log(`Server running on port ${port}`));
-}
-
-module.exports = app;
+app.listen(port, () => console.log(`Server running on port ${port}`));
