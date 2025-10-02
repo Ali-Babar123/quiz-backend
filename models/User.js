@@ -63,7 +63,7 @@ const signupSchema = new mongoose.Schema({
       fieldOfStudy: String,
       startYear: Number,
       endYear: Number,
-      grade: Number,
+      grade: String,
       description: String,
     },
   ],

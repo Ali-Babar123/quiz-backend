@@ -161,6 +161,7 @@ exports.filterJobs = async (req, res) => {
     const {
       workplaceType,
       jobType,
+      lastUpdate,
       positionLevel,
       locations,
       salaryRange,
@@ -197,13 +198,36 @@ exports.filterJobs = async (req, res) => {
       };
     }
 
-    if (locations && locations.length > 0) {
-      filter.$or = locations.map((loc) => ({
-        "location.city": { $regex: new RegExp(`^${loc.city}$`, "i") },
-        "location.state": { $regex: new RegExp(`^${loc.state}$`, "i") },
-        "location.country": { $regex: new RegExp(`^${loc.country}$`, "i") },
-      }));
-    }
+   if (locations && locations.length > 0) {
+  const locationFilters = [];
+
+  locations.forEach((loc) => {
+    const cityWords = loc.city ? loc.city.trim().split(/\s+/) : [];
+    const stateWords = loc.state ? loc.state.trim().split(/\s+/) : [];
+    const countryWords = loc.country ? loc.country.trim().split(/\s+/) : [];
+
+    cityWords.forEach((word) => {
+      locationFilters.push({
+        "location.city": { $regex: word, $options: "i" },
+      });
+    });
+
+    stateWords.forEach((word) => {
+      locationFilters.push({
+        "location.state": { $regex: word, $options: "i" },
+      });
+    });
+
+    countryWords.forEach((word) => {
+      locationFilters.push({
+        "location.country": { $regex: word, $options: "i" },
+      });
+    });
+  });
+
+  filter.$or = [...(filter.$or || []), ...locationFilters];
+}
+
 
     if (salaryRange && (salaryRange.min || salaryRange.max)) {
       filter["salaryRange.min"] = { $gte: salaryRange.min || 0 };
@@ -270,6 +294,32 @@ exports.filterJobs = async (req, res) => {
       jobTitle: { $regex: word, $options: "i" },
     })),
   ];
+}
+
+
+if (lastUpdate && lastUpdate !== "Any time") {
+  let days;
+
+  switch (lastUpdate) {
+    case "Recent":
+      days = 1;
+      break;
+    case "Last week":
+      days = 7;
+      break;
+    case "Last month":
+      days = 30;
+      break;
+    default:
+      days = null;
+  }
+
+  if (days !== null) {
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+
+    filter.updatedAt = { $gte: fromDate }; // or use createdAt if that's what you prefer
+  }
 }
 
 
