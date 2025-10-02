@@ -119,20 +119,60 @@ exports.deleteJob = async (req, res) => {
 exports.getJobsByEmployer = async (req, res) => {
   try {
     const { employerId } = req.params;
-    console.log(employerId)
+    const { page = 1, limit = 10 } = req.query; // pagination defaults
 
-    const jobs = await Job.find({ employerId });
+    const skip = (page - 1) * limit;
+
+    // 1. Get paginated jobs (latest first)
+    const jobs = await Job.find({ employerId })
+      .sort({ createdAt: -1 })
+      .skip(parseInt(skip))
+      .limit(parseInt(limit));
+
+    // 2. Total jobs by this employer
+    const totalJobs = await Job.countDocuments({ employerId });
+
+    // 3. Get all jobs for stats calculation
+    const jobsForStats = await Job.find({ employerId }, "appliedUsers status");
+
+    // ✅ Total applicants (sum of appliedUsers.length across jobs)
+    const totalApplicants = jobsForStats.reduce((acc, job) => {
+      return acc + (Array.isArray(job.appliedUsers) ? job.appliedUsers.length : 0);
+    }, 0);
+
+    // ✅ Active vs Closed jobs
+    const activeJobs = jobsForStats.filter(job => job.status === "Active").length;
+    const closedJobs = jobsForStats.filter(job => job.status === "Closed").length;
 
     if (!jobs || jobs.length === 0) {
-      return res.status(404).json({ success: false, message: "No jobs found for this employer" });
+      return res.status(404).json({
+        success: false,
+        message: "No jobs found for this employer"
+      });
     }
 
-    res.status(200).json({ success: true, jobs });
+    res.status(200).json({
+      success: true,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        totalJobs,
+        totalPages: Math.ceil(totalJobs / limit),
+      },
+      stats: {
+        totalApplicants,
+        activeJobs,
+        closedJobs,
+      },
+      jobs,
+    });
   } catch (error) {
     console.error("❌ Get Jobs by Employer Error:", error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+
 exports.getApplicationsByJobIds = async (req, res) => {
   try {
     const jobIds = req.query.jobIds?.split(",");
