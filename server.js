@@ -21,7 +21,12 @@ const googleLoginRoute = require('./routes/googleLogin');
 const uploadMultipleImageRoute = require('./routes/uploadMultipleImages');
 const educationRoute = require('./routes/education')
 const projectRoute = require('./routes/project')
-const experienceRoute = require('./routes/experience')
+const experienceRoute = require('./routes/experience');
+
+
+
+// Question Solver app 
+const signupRoute = require('./routes/signupRoute');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -130,7 +135,6 @@ app.post("/api/request-otp", async (req, res) => {
     const token = jwt.sign(
       { id: newUser._id, email: newUser.email, userType: newUser.userType }, // include userType in token too if needed
       process.env.JWT_SECRET,
-      { expiresIn: "1d" }
     );
 
     res.json({
@@ -305,6 +309,13 @@ app.use('/api', uploadMultipleImageRoute);
 app.use('/api', educationRoute);
 app.use('/api', projectRoute);
 app.use('/api', experienceRoute);
+
+
+
+
+
+//   Question Solver App apis
+app.use('/api/profile', signupRoute);
 // Default route
 app.get("/", (req, res) => res.send("Running with OTP verification!"));
 
