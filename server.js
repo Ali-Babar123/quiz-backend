@@ -169,12 +169,16 @@ app.post("/api/login", async (req, res) => {
       return res.status(400).json({ success: false, error: "User not found" });
     }
 
+    // Check if user has a password set
+    if (!user.password) {
+      return res.status(400).json({ success: false, error: "Account does not have a password. Please reset your Password." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, error: "Invalid credentials" });
     }
 
-    // Include userType in JWT payload
     const token = jwt.sign(
       { id: user._id, userType: user.userType },
       process.env.JWT_SECRET,
@@ -188,7 +192,7 @@ app.post("/api/login", async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        userType: user.userType, // ✅ Fixed: include userType in response
+        userType: user.userType,
       },
     });
   } catch (error) {
@@ -196,6 +200,7 @@ app.post("/api/login", async (req, res) => {
     res.status(500).json({ success: false, error: "Server error" });
   }
 });
+
 
 
 // Simple Signup (no password, no OTP)
