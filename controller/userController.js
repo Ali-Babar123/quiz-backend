@@ -88,19 +88,26 @@ exports.changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
 
-    // req.user.id -> verifyToken middleware se aayega
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    // Check if old password is correct
+    // 🔒 Check if user has a password set
+    if (!user.password) {
+      return res.status(400).json({
+        success: false,
+        message: "You do not have a password set. Please set a new password directly."
+      });
+    }
+
+    // ✅ Check if old password is correct
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
       return res.status(400).json({ success: false, message: "Previous password is incorrect" });
     }
 
-    // Hash new password
+    // 🔐 Hash and set new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
@@ -112,6 +119,7 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 exports.getMultipleUsers = async (req, res) => {
   try {
