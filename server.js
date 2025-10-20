@@ -30,6 +30,9 @@ const signupRoute = require('./routes/signupRoute');
 const AnotherEmailRoute = require('./routes/anotherEmail')
 const AnotherResetPassword = require('./routes/AnotherResetPassword')
 
+
+// Download Video
+const downloadVideo = require('./routes/videodownloader')
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -321,10 +324,15 @@ app.use('/api', experienceRoute);
 
 
 
+
 //   Question Solver App apis
 app.use('/api/profile', signupRoute);
 app.use('/api/anotherEmail', AnotherEmailRoute)
 app.use('/api/anotherEmail', AnotherResetPassword);
+
+
+// downlaod videos
+app.use('/api/download', downloadVideo);
 
 // Default route
 app.get("/", (req, res) => res.send("Running with OTP verification!"));
