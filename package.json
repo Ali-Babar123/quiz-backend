@@ -13,6 +13,7 @@
   },
   "keywords": [],
   "dependencies": {
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
@@ -28,6 +29,7 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.5",
     "play-dl": "^1.9.7",
+    "puppeteer": "^24.25.0",
     "ytdl-core": "^4.11.5"
   },
   "devDependencies": {
