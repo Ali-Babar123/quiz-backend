@@ -32,6 +32,8 @@ const AnotherResetPassword = require('./routes/AnotherResetPassword')
 // QoutesRoute
 const QuotesRoute = require('./routes/QuotesRoutes');
 const WriterQuotes = require('./routes/writerQuotesRoutes');
+const musicRoutes = require('./routes/musicRoutes');
+const musicCatalogRoutes = require('./routes/musicCatalog')
 
 
 const app = express();
@@ -334,6 +336,9 @@ app.use('/api/anotherEmail', AnotherResetPassword);
 
 // downlaod videos
 app.use('/api/quotes', QuotesRoute);
+app.use("/api/music", musicRoutes);
+app.use("/api/music", musicCatalogRoutes);
+
 
 app.use('/api/writerQuotes', WriterQuotes);
 
