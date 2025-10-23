@@ -24,14 +24,14 @@ const projectRoute = require('./routes/project')
 const experienceRoute = require('./routes/experience');
 
 
-
 // Question Solver app 
 const signupRoute = require('./routes/signupRoute');
 const AnotherEmailRoute = require('./routes/anotherEmail')
 const AnotherResetPassword = require('./routes/AnotherResetPassword')
 
 // QoutesRoute
-const QuotesRoute = require('./routes/QuotesRoutes')
+const QuotesRoute = require('./routes/QuotesRoutes');
+const WriterQuotes = require('./routes/writerQuotesRoutes');
 
 
 const app = express();
@@ -334,6 +334,8 @@ app.use('/api/anotherEmail', AnotherResetPassword);
 
 // downlaod videos
 app.use('/api/quotes', QuotesRoute);
+
+app.use('/api/writerQuotes', WriterQuotes);
 
 // Default route
 app.get("/", (req, res) => res.send("Running with OTP verification!"));
