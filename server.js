@@ -47,7 +47,7 @@ connectDB();
 
 // Middlewares
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://nasir.temp2027.com', 'https://api.earnwithzippy.com'],
+  origin: ['http://localhost:5173', 'https://nasir.temp2027.com', 'https://api.lightislamapp.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
